@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF AI Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PDF AI Assistant</h1>
+            <p>PDF 파일을 업로드하고 AI 기능을 활용해보세요</p>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <div class="upload-container">
+                    <input type="file" id="pdfFile" accept=".pdf" class="file-input">
+                    <label for="pdfFile" class="file-label">
+                        <span>PDF 파일 선택</span>
+                        <small>또는 파일을 여기에 드래그하세요</small>
+                    </label>
+                </div>
+                <div id="pdfPreview" class="pdf-preview"></div>
+            </section>
+
+            <section class="features-section">
+                <div class="feature-card">
+                    <h3>문서 요약</h3>
+                    <button id="summarizeBtn" class="feature-btn">요약하기</button>
+                    <div id="summaryResult" class="result-box"></div>
+                </div>
+
+                <div class="feature-card">
+                    <h3>주요 개념 추출</h3>
+                    <button id="conceptsBtn" class="feature-btn">개념 추출하기</button>
+                    <div id="conceptsResult" class="result-box"></div>
+                </div>
+
+                <div class="feature-card">
+                    <h3>퀴즈 생성</h3>
+                    <button id="quizBtn" class="feature-btn">퀴즈 만들기</button>
+                    <div id="quizResult" class="result-box"></div>
+                </div>
+            </section>
+        </main>
+
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>처리 중...</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
