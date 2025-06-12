@@ -24,6 +24,7 @@ const Message = styled.div`
   padding: 10px 15px;
   border-radius: 10px;
   max-width: 70%;
+  white-space: pre-wrap;
   ${props => props.isUser ? `
     background-color: #007bff;
     color: white;
