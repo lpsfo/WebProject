@@ -20,10 +20,16 @@ const TabContainer = styled.div`
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  width: 90%;
+  max-width: 800px;
+  margin: 0 auto 20px auto;
+  justify-content: center;
 `;
 
 const Tab = styled(({ active, ...rest }) => <button {...rest} />)`
-  padding: 10px 20px;
+  flex: 3;
+  max-width: calc(45%);
+  padding: 10px 100px;
   background-color: ${props => props.active ? '#007bff' : '#e9ecef'};
   color: ${props => props.active ? 'white' : '#333'};
   border: none;
@@ -31,6 +37,7 @@ const Tab = styled(({ active, ...rest }) => <button {...rest} />)`
   cursor: pointer;
   font-size: 16px;
   transition: all 0.3s ease;
+  white-space: nowrap;
 
   &:hover {
     background-color: ${props => props.active ? '#0056b3' : '#dee2e6'};
@@ -42,6 +49,9 @@ const ContentContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  width: 90%;
+  max-width: 800px;
+  margin: 0 auto;
 `;
 
 function App() {
