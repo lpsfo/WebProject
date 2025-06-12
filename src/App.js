@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import ChatInterface from './components/ChatInterface';
 import FileSidebar from './components/FileSidebar';
@@ -20,9 +20,9 @@ const MainContent = styled.div`
 function App() {
   const [files, setFiles] = useState([]);
 
-  const handleFilesUpdate = (updatedFiles) => {
+  const handleFilesUpdate = useCallback((updatedFiles) => {
     setFiles(updatedFiles);
-  };
+  }, []);
 
   return (
     <AppContainer>
