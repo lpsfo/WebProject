@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import QuizMessage from './QuizMessage';
+import { generateSystemMessage } from '../utils/generateSystemMessage';
 
 const ChatContainer = styled.div`
   width: 90%;
@@ -78,47 +79,20 @@ ${file.content}
 `).join('\n');
   };
 
+  const fileContext = createContextFromFiles();
+  const systemMessage = generateSystemMessage({ fileContext, isQuizMode });
+
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage = input;
+    const userMessage = isQuizMode && input.trim().toLowerCase().includes("퀴즈")
+      ? `${input} [요청 ID: ${Date.now()}]` // 입력에 변동값을 추가
+      : input;
     setInput('');
     setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
     setIsLoading(true);
 
     try {
-      const fileContext = createContextFromFiles();
-      const systemMessage = fileContext ?
-        isQuizMode ?
-          `당신은 전문적인 퀴즈 생성 AI입니다. 사용자가 업로드한 파일의 내용을 바탕으로 퀴즈를 생성해주세요.
-
-파일 내용:
-${fileContext}
-
-지침:
-- 파일 내용을 바탕으로 적절한 난이도의 퀴즈를 생성하세요.
-- 객관식, 주관식 등 다양한 형태의 퀴즈를 생성할 수 있습니다.
-- 퀴즈는 한글로 작성해주세요.
-- 답변은 별도로 제공해주세요.`
-          :
-          `당신은 전문적인 AI 조수입니다. 사용자가 업로드한 파일은 다음과 같은 컨텍스트를 제공합니다. 이 파일의 내용을 정확하게 참고하여 질문에 답변하고, 필요 시 해당 문맥을 인용하거나 요약하여 설명하세요.
-
-파일 내용:
-${fileContext}
-
-지침:
-- 파일 내용을 바탕으로 구체적이고 정확하게 답변하세요.
-- 모호하거나 누락된 정보가 있으면 정중하게 사용자에게 질문하여 명확히 하세요.
-- 답변은 간결하되, 필요한 경우 예시나 코드 블록을 포함하여 설명하세요.
-- 답변이 길어지거나, 너무 많은 내용을 포함하거나, 번호로 순서가 있는 경우 적절하게 줄바꿈을 해주세요.
-- 사용자의 의도를 먼저 파악하고, 그것에 맞는 도움을 제공하세요.
-- 답변은 한글로 작성해주세요.`
-        :
-        isQuizMode ?
-          `당신은 전문적인 퀴즈 생성 AI입니다. 사용자의 요청에 따라 다양한 퀴즈를 생성해주세요.`
-          :
-          `당신은 전문적인 AI 조수입니다. 지금은 파일이 제공되지 않았으므로 일반적인 대화에 친절하고 명확하게 응답해주세요. 사용자의 질문에 적절히 예시를 들고, 추가적인 질문이 필요한 경우에는 유도 질문을 해주세요.`;
-
       const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
         model: 'meta-llama/llama-4-maverick:free',
         messages: [
@@ -148,6 +122,7 @@ ${fileContext}
     }
   };
 
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -161,7 +136,7 @@ ${fileContext}
         {messages.map((message, index) => (
           <Message key={index} isUser={message.isUser}>
             {isQuizMode && !message.isUser && message.text.includes('문제:') ? (
-              <QuizMessage text={message.text} />
+              <QuizMessage text={message.text} fileContext={fileContext} quizId={index} />
             ) : (
               message.text
             )}
