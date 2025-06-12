@@ -22,7 +22,7 @@ const TabContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-const Tab = styled.button`
+const Tab = styled(({ active, ...rest }) => <button {...rest} />)`
   padding: 10px 20px;
   background-color: ${props => props.active ? '#007bff' : '#e9ecef'};
   color: ${props => props.active ? 'white' : '#333'};
@@ -59,14 +59,14 @@ function App() {
       <FileSidebar onFilesUpdate={handleFilesUpdate} />
       <MainContent>
         <TabContainer>
-          <Tab 
-            active={activeTab === 'chat'} 
+          <Tab
+            active={activeTab === 'chat'}
             onClick={() => setActiveTab('chat')}
           >
             대화
           </Tab>
-          <Tab 
-            active={activeTab === 'quiz'} 
+          <Tab
+            active={activeTab === 'quiz'}
             onClick={() => setActiveTab('quiz')}
           >
             퀴즈
@@ -74,13 +74,13 @@ function App() {
         </TabContainer>
         <ContentContainer>
           {activeTab === 'chat' ? (
-            <ChatInterface 
-              files={files} 
+            <ChatInterface
+              files={files}
               messages={chatMessages}
               setMessages={setChatMessages}
             />
           ) : (
-            <ChatInterface 
+            <ChatInterface
               files={files}
               messages={quizMessages}
               setMessages={setQuizMessages}

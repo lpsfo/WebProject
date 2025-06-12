@@ -86,9 +86,11 @@ function QuizMessage({ text, fileContext, quizId }) {
         const lines = fileContext.split('\n');
         const relevantLines = lines
             .map((line, i) => ({ line, i }))
-            .filter(({ line }) =>
-                line.includes(selectedOption) || line.includes(correctOption)
-            )
+            .filter(({ line }) => {
+                const normalized = str => str.replace(/[\s"“”‘’'`]+/g, '').toLowerCase();
+                return normalized(line).includes(normalized(selectedOption)) || 
+                       normalized(line).includes(normalized(correctOption));
+            })
             .flatMap(({ i }) => lines.slice(Math.max(0, i - 1), i + 2)); // 앞뒤 줄 포함
 
         const relevantContent = Array.from(new Set(relevantLines)).join('\n');

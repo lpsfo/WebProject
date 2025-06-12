@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import QuizMessage from './QuizMessage';
 import { generateSystemMessage } from '../utils/generateSystemMessage';
+import dayjs from 'dayjs';
 
 const ChatContainer = styled.div`
   width: 90%;
@@ -71,12 +72,7 @@ function ChatInterface({ files, messages, setMessages, isQuizMode = false }) {
   const createContextFromFiles = () => {
     if (!files || files.length === 0) return '';
 
-    return files.map(file => `
-파일명: ${file.name}
-내용:
-${file.content}
----
-`).join('\n');
+    return files.map(file => `파일명: ${file.name}내용:${file.content}---`).join('\n');
   };
 
   const fileContext = createContextFromFiles();
@@ -85,9 +81,13 @@ ${file.content}
   const sendMessage = async () => {
     if (!input.trim()) return;
 
+    const getFormattedTimestamp = () => {
+      return dayjs().format('YYYY-MM-DD HH:mm:ss');
+    };
     const userMessage = isQuizMode && input.trim().toLowerCase().includes("퀴즈")
-      ? `${input} [요청 ID: ${Date.now()}]` // 입력에 변동값을 추가
+      ? `${input} (${getFormattedTimestamp()})`
       : input;
+
     setInput('');
     setMessages(prev => [...prev, { text: userMessage, isUser: true }]);
     setIsLoading(true);
@@ -95,6 +95,7 @@ ${file.content}
     try {
       const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
         model: 'meta-llama/llama-4-maverick:free',
+        temperature: 0.9, // 무작위성 추가
         messages: [
           {
             role: 'system',
