@@ -73,23 +73,27 @@ const DeleteButton = styled.button`
 function FileSidebar({ onFilesUpdate }) {
   const [files, setFiles] = useState([]);
 
+  // useEffect(() => {
+  //   // 로컬 스토리지에서 파일 목록 불러오기
+  //   const savedFiles = JSON.parse(localStorage.getItem('files') || '[]');
+  //   setFiles(savedFiles);
+  //   onFilesUpdate(savedFiles);
+  // }, [onFilesUpdate]);
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('files') || '[]');
-    if (JSON.stringify(saved) !== JSON.stringify(files)) {
-      setFiles(saved);
-      onFilesUpdate(saved);
-    }
-  }, []);
-
+    const savedFiles = JSON.parse(localStorage.getItem('files') || '[]');
+    setFiles(savedFiles);
+    onFilesUpdate(savedFiles);
+  }, [onFilesUpdate]);
+  
 
   const readFileContent = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-
+      
       reader.onload = (event) => {
         resolve(event.target.result);
       };
-
+      
       reader.onerror = (error) => {
         reject(error);
       };
