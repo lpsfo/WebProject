@@ -61,10 +61,21 @@ const SendButton = styled.button`
   }
 `;
 
-function ChatInterface() {
+function ChatInterface({ files }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const createContextFromFiles = () => {
+    if (!files || files.length === 0) return '';
+    
+    return files.map(file => `
+파일명: ${file.name}
+내용:
+${file.content}
+---
+`).join('\n');
+  };
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -75,9 +86,18 @@ function ChatInterface() {
     setIsLoading(true);
 
     try {
+      const fileContext = createContextFromFiles();
+      const systemMessage = fileContext ? 
+        `다음은 사용자가 업로드한 파일들의 내용입니다. 이 내용을 참고하여 질문에 답변해주세요:\n\n${fileContext}` :
+        '일반적인 대화를 나누어주세요.';
+
       const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
         model: 'meta-llama/llama-4-maverick:free',
         messages: [
+          {
+            role: 'system',
+            content: systemMessage
+          },
           {
             role: 'user',
             content: userMessage

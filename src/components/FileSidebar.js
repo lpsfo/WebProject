@@ -70,32 +70,74 @@ const DeleteButton = styled.button`
   }
 `;
 
-function FileSidebar() {
+function FileSidebar({ onFilesUpdate }) {
   const [files, setFiles] = useState([]);
 
   useEffect(() => {
     // 로컬 스토리지에서 파일 목록 불러오기
     const savedFiles = JSON.parse(localStorage.getItem('files') || '[]');
     setFiles(savedFiles);
-  }, []);
+    onFilesUpdate(savedFiles);
+  }, [onFilesUpdate]);
 
-  const handleFileUpload = (event) => {
+  const readFileContent = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = (event) => {
+        resolve(event.target.result);
+      };
+      
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      if (file.type === 'application/pdf') {
+        // PDF 파일은 현재 텍스트 추출이 불가능하므로 안내 메시지 반환
+        resolve('PDF 파일은 현재 텍스트 추출이 지원되지 않습니다.');
+      } else {
+        reader.readAsText(file);
+      }
+    });
+  };
+
+  const handleFileUpload = async (event) => {
     const newFiles = Array.from(event.target.files);
-    const updatedFiles = [...files, ...newFiles.map(file => ({
-      name: file.name,
-      type: file.type,
-      size: file.size,
-      lastModified: file.lastModified
-    }))];
-    
+    const processedFiles = await Promise.all(
+      newFiles.map(async (file) => {
+        try {
+          const content = await readFileContent(file);
+          return {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            lastModified: file.lastModified,
+            content: content
+          };
+        } catch (error) {
+          console.error(`Error reading file ${file.name}:`, error);
+          return {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            lastModified: file.lastModified,
+            content: '파일을 읽는 중 오류가 발생했습니다.'
+          };
+        }
+      })
+    );
+
+    const updatedFiles = [...files, ...processedFiles];
     setFiles(updatedFiles);
     localStorage.setItem('files', JSON.stringify(updatedFiles));
+    onFilesUpdate(updatedFiles);
   };
 
   const handleFileDelete = (index) => {
     const updatedFiles = files.filter((_, i) => i !== index);
     setFiles(updatedFiles);
     localStorage.setItem('files', JSON.stringify(updatedFiles));
+    onFilesUpdate(updatedFiles);
   };
 
   const formatFileSize = (bytes) => {
